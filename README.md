@@ -40,7 +40,9 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 
 **Examples**
 
-
+![Screenshot_303](https://user-images.githubusercontent.com/86683320/162412569-6b848e27-f8fe-4275-a877-fcc5ec297268.png)
+![Screenshot_304](https://user-images.githubusercontent.com/86683320/162412657-545c5b21-6985-40a9-abfe-e0d37f8c25dc.png)
+![Screenshot_305](https://user-images.githubusercontent.com/86683320/162412681-d89ca4cc-bb9e-4b6d-b509-52f2bb5b02b5.png)
 
 ```
 Reporting bugs:
