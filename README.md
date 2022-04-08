@@ -14,3 +14,8 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 Link to cloudburstmc article -> [CloudburstMC](https://cloudburstmc.org/resources/nickchangergui.783/)
 
 # Examples of AuctionHouse
+
+```
+    Здесь может быть
+    Ваша реклама
+```
