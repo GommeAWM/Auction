@@ -23,14 +23,20 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 :black_square_button: Configure in Config;<br />
 :black_square_button: Launch the server;<br />
 
+---
+
 **Usage:**<br />
 :unlock: To open up auctionhouse main menu type `/ah` into the chat.<br />
+
+---
 
 **all Information**
 
 | Command | Permission | Descripton | config |
 | --- | ------|-----| -------|
 |ah| reyd.auction |the players can 'sell' or 'buy' items from other players|support|
+
+---
 
 **Examples**
 
