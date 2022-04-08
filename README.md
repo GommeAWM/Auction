@@ -3,8 +3,8 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 
 ---
 **Requirement:**<br />
-> * Download the latest version here: [LlamaEconomy](https://cloudburstmc.org/resources/llamaeconomy.634/)
-> * Download the latest version here: [FakeInventories](https://github.com/CloudburstMC/FakeInventories)
+> * Download the `latest version` here: [LlamaEconomy](https://cloudburstmc.org/resources/llamaeconomy.634/)
+> * Download the `latest version` here: [FakeInventories](https://github.com/CloudburstMC/FakeInventories)
 
 ---
 
@@ -23,8 +23,10 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 :black_square_button: Configure in Config;<br />
 :black_square_button: Launch the server;<br />
 
-**Usage:**
-:unlock: To open up auctionhouse main menu type `/ah` into the chat.
+**Usage:**<br />
+:unlock: To open up auctionhouse main menu type `/ah` into the chat.<br />
+
+**all Information**
 
 | Command | Permission | Descripton | config |
 | --- | ------|-----| -------|
@@ -35,6 +37,6 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 
 
 ```
-**Reporting bugs:**
+Reporting bugs:
 If you come across a bug, please report it here or on cloudburstmc.
 ```
