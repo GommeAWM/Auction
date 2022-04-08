@@ -1,14 +1,13 @@
 # Auction
 AuctionHouse | Minecraft Bedrock Edition | Nukkit
 
-:star: ***Features:***
-```
-:star: Buying and selling items in `InventoryInterface/ChestInterface`;`rel`
+***Features:***
+
+:star: Buying and selling items in `InventoryInterface/ChestInterface`;
 :star: Support for items with enchantments;
 :star: Timer ( If the items are not sold within 8 hours, they will be put into storage ) // The 'time' you can 'edit' in 'Config';
 :star: Storage for Items;
 :star: Set how many items the player can bring to the auction;
-```
 
 ```
 **Installation:**
