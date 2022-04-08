@@ -1,0 +1,5 @@
+main: getmc.Auction
+name: GetAuction
+version: 1.0.3
+api: ["1.0.13"]
+author: Reydovich
