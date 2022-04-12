@@ -52,6 +52,11 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 
 ---
 
+> * Link to cloudburstmc article -> [CloudburstMC](https://cloudburstmc.org/resources/auctionhouse.796/)
+
+---
+
+
 ```
 Reporting bugs: If you come across a bug, please report it here or on cloudburstmc.
 ```
