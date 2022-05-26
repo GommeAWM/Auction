@@ -7,6 +7,14 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 > * Download the `latest version` here: [FakeInventories](https://github.com/CloudburstMC/FakeInventories)
 
 ---
+**Update:**<br/>
+
+*26.05.2022*
+:boom: Now the AuctionPlugin supports EconomyAPI and LlamEconomyAPI<br/>
+:boom: Fixed the dupe money bug, now the owner can't buy their item anymore<br/>
+:boom: code optimized<br/>
+
+---
 
 ***Features:***<br />
 :star: Buying and selling items in `InventoryInterface/ChestInterface`;<br />
