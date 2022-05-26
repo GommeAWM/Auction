@@ -4,7 +4,6 @@ import cn.nukkit.Player;
 import cn.nukkit.command.Command;
 import cn.nukkit.command.CommandSender;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.ItemNameTag;
 import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.nbt.tag.CompoundTag;
 import cn.nukkit.utils.Config;
@@ -44,12 +43,20 @@ public class AucCMD extends Command {
             }
 
             if (args.length == 0){
-                openAction(player);
+                openAction(player); // open Auction
             }
 
             if (args.length == 1){
-                player.sendMessage(Auction.getAuctionConfig().usageMessage());
+
+                player.sendMessage(Auction.getAuctionConfig().usageMessage()); // Usage Message
+
             }
+
+            /*
+
+            Just add items in config
+
+             */
 
             if (args.length == 2){
 
@@ -62,6 +69,12 @@ public class AucCMD extends Command {
 
                     if (msg.equals("sell")){
 
+                        /*
+
+                        Get Config
+
+                         */
+
                         Config auccfg = new Config(new File(Auction.getAuction().getDataFolder(), "/auction.yml"), Config.YAML);
                         auccfg.reload();
 
@@ -71,26 +84,34 @@ public class AucCMD extends Command {
                         Config timercfg = new Config(new File(Auction.getAuction().getDataFolder(), "/timer.yml"), Config.YAML);
                         timercfg.reload();
 
+                        /*
+
+                        Check for price [args{1}]
+
+                         */
+
                         if (cost <= 0){
                             player.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().price());
                             return true;
                         }
 
+                        /*
+
+                        Check Hand if that's not a AIR (nothing)
+
+                         */
+
                         if (player.getInventory().getItemInHand() == null || player.getInventory().getItemInHand() == Item.get(Item.AIR) || player.getInventory().getItemInHand().getId() == 0){
                             player.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().take());
 
-//                            for(Map.Entry<String, Object> get2 : timercfg.getSections("Timer").getAll().entrySet()) {
-//                                String get1 = get2.getKey();
-//
-//
-//                                int checkfornull = timercfg.getInt("Timer." + get1 + ".Count");
-//                                player.sendMessage(get1 + " " + checkfornull);
-//
-//
-//                            }
-
                             return true;
                         }
+
+                        /*
+
+                        Get important information of Item
+
+                         */
 
                         Item item = player.getInventory().getItemInHand();
                         String item1 = player.getInventory().getItemInHand().getName();
@@ -105,11 +126,15 @@ public class AucCMD extends Command {
 
                         String comp = String.valueOf(compoundTag);
 
-
-
                         if (countcfg.get(name) == null){
                             countcfg.set(name, 0);
                         }
+
+                        /*`
+
+                        Check if player have reached his MaxSellItems on Auction
+
+                         */
 
                         int maxcountsellitems = countcfg.getInt(name);
 
@@ -122,22 +147,21 @@ public class AucCMD extends Command {
                             countcfg.save();
                         }
 
-                        String hashcode = generateRandomPassword(10);
+                        String hashcode = generateRandomPassword(10); // generate HashCode
                         String date = getDate();
 
                         if (auccfg.get(hashcode) != null){
+
                             player.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().sfalse());
                             return true;
-//                        String hashcodenew = generateRandomPassword(10);
-//
-//                        auccfg.set("Auction." + hashcodenew + ".Cost", cost);
-////                        auccfg.set("Auction." + hashcodenew + ".Item", itemname);
-//                        auccfg.set("Auction." + hashcodenew + ".Owner", name);
-//                        auccfg.set("Auction." + hashcodenew + ".Count", count);
-//                        auccfg.set("Auction." + hashcodenew + ".Id", item.getId());
-//                        auccfg.save();
 
                         } else {
+
+                            /*
+
+                            Put important Information info Config
+
+                             */
 
                             startItemCount(hashcode);
 
@@ -157,6 +181,12 @@ public class AucCMD extends Command {
                             timercfg.set("Timer." + hashcode + ".Count", time);
                             timercfg.save();
 
+                            /*
+
+                            Put Enchantments into Config
+
+                             */
+
                             if (item.hasEnchantments()) {
                                 for (int i1 = 0; i1 < item.getEnchantments().length; i1++) {
                                     Enchantment e1 = item.getEnchantments()[i1];
@@ -165,16 +195,12 @@ public class AucCMD extends Command {
                                 }
                             }
 
-                            auccfg.save();
+                            auccfg.save(); // IMPORTANT SAVE
                         }
                         player.getInventory().setItemInHand(Item.get(Item.AIR));
 
                         player.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().sell());
 
-
-                        // if count == 4 cancel
-
-                        // price - owner - data
                     }
 
                     if (msg.equals("info")){
@@ -205,10 +231,11 @@ public class AucCMD extends Command {
             Auction.getAuction().chest.put(49,saveItems);
         }
 
-        ChestFakeInventory ec = new FakeInventories().createDoubleChestInventory();
+        ChestFakeInventory ec = new DoubleChestFakeInventory();
         ec.setName(Auction.getAuctionConfig().title());
         ec.setTitle(Auction.getAuctionConfig().title());
         ec.setContents(Auction.getAuction().chest);
+
         player.addWindow(ec);
         ec.addListener(this::onSlotChange);
     }
@@ -220,6 +247,12 @@ public class AucCMD extends Command {
 
         Config timercfg = new Config(new File(Auction.getAuction().getDataFolder(), "/timer.yml"), Config.YAML);
         timercfg.reload();
+
+        /*
+
+        Just to keep Information of Item in this Area
+
+         */
 
         Auction.getAuction().chest = new Int2ObjectOpenHashMap(); //Adds the chest items to this array
         Auction.getAuction().chest1 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
@@ -242,17 +275,12 @@ public class AucCMD extends Command {
         Auction.getAuction().chest18 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
         Auction.getAuction().chest19 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
         Auction.getAuction().chest20 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest21 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest22 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest23 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest24 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest25 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest26 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest27 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest28 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest29 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest30 = new Int2ObjectOpenHashMap<>(); //Adds the chest items to this array
-//        Auction.getAuction().chest1 = new HashMap<>(); //Adds the chest items to this array
+
+        /*
+
+        -1 is just for first Slot
+
+         */
 
         int i = -1;
         int a = -1;
@@ -275,6 +303,13 @@ public class AucCMD extends Command {
         int s = -1;
         int t = -1;
         int u = -1;
+
+        /*
+
+        Here we will get All Information from Config and put this into chest1, chest2...
+
+         */
+
         for(Map.Entry<String, Object> get2 : auccfg.getSections("Auction").getAll().entrySet()){
             String get1 = get2.getKey();
             int price = auccfg.getInt("Auction." + get1 + ".Cost");
@@ -284,12 +319,9 @@ public class AucCMD extends Command {
             int count1 = auccfg.getInt("Auction." + get1 + ".Count");
             int damege = auccfg.getInt("Auction." + get1 + ".Damage");
             String hashcode = auccfg.getString("Auction." + get1 + ".Hash");
-            String date = auccfg.getString("Auction." + hashcode + ".Date");
+            String date = auccfg.getString("Auction." + get1 + ".Date");
 
-            int timer = timercfg.getInt("Timer." + hashcode + ".Count");
-
-//            String Compond = auccfg.getString("Auction." + get1 + ".Cnt");
-//            List<String> enchant = auccfg.getStringList("Auction." + get1 + ".enchantment");
+            int timer = timercfg.getInt("Timer." + get1 + ".Count");
 
             String textprice = Auction.getAuctionConfig().textprice();
             String value = Auction.getAuctionConfig().value();
@@ -299,7 +331,7 @@ public class AucCMD extends Command {
             String textdate = Auction.getAuctionConfig().textdate();
             String texthash = Auction.getAuctionConfig().texthash();
 
-            Item item2 = Item.get(id, damege, count1).setCustomName(item1 + "\n\n" + textprice + price + value + "\n" + textowner + owner + "\n" + textuntil + timer + timevalue + "\n" + textdate + date + "\n" + texthash + hashcode + "\n");
+            Item item2 = Item.get(id, damege, count1).setCustomName(item1 + "\n\n" + textprice + price + value + "\n" + textowner + owner + "\n" + textuntil + timer + timevalue + "\n" + texthash + hashcode + "\n" + textdate + date + "\n");
             item2.setDamage(damege);
             for (String enchId : auccfg.getSection("Auction." + get1 + ".Enchants").getKeys(false)) {
                 int id1 = Integer.parseInt(enchId);
@@ -632,49 +664,13 @@ public class AucCMD extends Command {
         return sb.toString();
     }
 
-//    public void pages(Item item2){
-//        a = a + 1;
-//        Auction.getAuction().pages.add(a);
-//
-//        ChestFakeInventory ec = new FakeInventories().createDoubleChestInventory();
-//        ec.setName("Аукцион");
-//        ec.setTitle("Аукцион");
-//        ec.addItem(item2);
-//        ec.addListener(this::onSlotChange);
-//        if (ec.getSize() == 44){
-//            a = a + 1;
-//            pages(item2);
-//        }
-//
-//    }
-
     public static String getDate() {
         Date now = new Date();
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yy HH:mm");
         return dateFormat.format(now);
     }
 
-//    public void onChest(InventoryTransactionEvent e) {
-//        Player pl = e.getTransaction().getSource();
-//
-//        if (e.getTransaction().getInventories() instanceof DoubleChestFakeInventory){
-//            if (((DoubleChestFakeInventory) e.getTransaction().getInventories()).getName().equals("Аукцион")){
-//                for (final InventoryAction action : e.getTransaction().getActions()) {
-//                    if (this.interact(action.getSourceItem().getId(), e.getTransaction().getSource(), e.getTransaction().getInventories()) || this.interact(action.getTargetItem().getId(), e.getTransaction().getSource(), e.getTransaction().getInventories())) {
-//                        return;
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     public void onSlotChange(FakeSlotChangeEvent event){
-//        if (event.getInventory() instanceof ChestFakeInventory){
-//            if (event.getInventory().getName().equals("Аукцион")){
-//                Player player = event.getPlayer();
-//                event.setCancelled(true);
-//            }
-//        }
 
         if (event.getInventory() instanceof DoubleChestFakeInventory){
             if (event.getInventory().getName().equals(Auction.getAuctionConfig().title())){
@@ -683,15 +679,6 @@ public class AucCMD extends Command {
         }
 
     }
-
-//    private boolean interact(int id, Player player, Set<Inventory> inv) {
-//        switch (id) {
-//            case 280: {
-//                player.sendMessage("test");
-//            }
-//        }
-//        return false;
-//    }
 
     private void startItemCount(String p){
 

@@ -5,8 +5,6 @@ import cn.nukkit.Server;
 import cn.nukkit.event.EventHandler;
 import cn.nukkit.event.Listener;
 import cn.nukkit.event.inventory.InventoryTransactionEvent;
-import cn.nukkit.form.element.ElementLabel;
-import cn.nukkit.form.window.FormWindowCustom;
 import cn.nukkit.inventory.transaction.InventoryTransaction;
 import cn.nukkit.inventory.transaction.action.InventoryAction;
 import cn.nukkit.inventory.transaction.action.SlotChangeAction;
@@ -16,13 +14,10 @@ import cn.nukkit.utils.Config;
 import com.nukkitx.fakeinventories.inventory.*;
 import getmc.Auction;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.lldv.llamaeconomy.LlamaEconomy;
 
 import java.io.File;
-import java.rmi.server.UID;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public class InventoryTransactionListener implements Listener {
@@ -62,60 +57,61 @@ public class InventoryTransactionListener implements Listener {
                             if (action.getSourceItem().getCustomName().contains(hashcode)) {
 
                                 int price = auccfg.getInt("Auction." + get1 + ".Cost");
-                                String item1 = auccfg.getString("Auction." + get1 + ".Items");
                                 String owner = auccfg.getString("Auction." + get1 + ".Owner");
                                 int id = auccfg.getInt("Auction." + get1 + ".Id");
                                 int count1 = auccfg.getInt("Auction." + get1 + ".Count");
                                 int damege = auccfg.getInt("Auction." + get1 + ".Damage");
                                 String uid = auccfg.getString("Auction." + get1 + ".Uid");
 
-                                double maincount = LlamaEconomy.getAPI().getMoney(pl);
+                                double maincount = Auction.getAuction().getMoney(pl.getName());
 
                                 if (maincount >= price) {
 
-                                    double resultprice = maincount - price;
-                                    LlamaEconomy.getAPI().setMoney(pl, resultprice);
-                                    int now = (int) LlamaEconomy.getAPI().getMoney(owner);
-                                    UUID uidr = UUID.fromString(uid);
-                                    LlamaEconomy.getAPI().addMoney(uidr, price);
+                                    if (pl.getName().toLowerCase().equals(owner)){
 
-                                    Item item12 = Item.get(id, damege, count1);
-                                    item12.setDamage(damege);
-                                    for (String enchId : auccfg.getSection("Auction." + get1 + ".Enchants").getKeys(false)) {
-                                        int id1 = Integer.parseInt(enchId);
-                                        int lvl = auccfg.getInt("Auction." + get1 + ".Enchants." + enchId);
-                                        item12.addEnchantment(Enchantment.getEnchantment(id1).setLevel(lvl, false));
-                                    }
+                                        pl.sendMessage(Auction.getAuctionConfig().cantbuy());
 
-                                    int count = countcfg.getInt(owner);
-                                    int result = count - 1;
-                                    countcfg.set(owner, result);
-                                    countcfg.save();
+                                    } else {
 
-                                    if (Server.getInstance().getPlayer(owner) != null) {
-                                        Server.getInstance().getPlayer(owner).sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().ownbuy());
-                                    }
-                                    pl.getInventory().addItem(item12);
-                                    for (Player all : Server.getInstance().getOnlinePlayers().values()) {
-                                        String name = all.getName();
-                                        if (name.toLowerCase().equals(owner.toLowerCase())) {
-                                            Server.getInstance().getPlayer(owner);
+                                        double resultprice = maincount - price;
+                                        Auction.getAuction().setMoney(pl, resultprice);
+                                        int now = (int) Auction.getAuction().getMoney(owner);
+                                        UUID uidr = UUID.fromString(uid);
+                                        Auction.getAuction().addMoney(uidr, price);
 
+                                        Item item12 = Item.get(id, damege, count1);
+                                        item12.setDamage(damege);
+                                        for (String enchId : auccfg.getSection("Auction." + get1 + ".Enchants").getKeys(false)) {
+                                            int id1 = Integer.parseInt(enchId);
+                                            int lvl = auccfg.getInt("Auction." + get1 + ".Enchants." + enchId);
+                                            item12.addEnchantment(Enchantment.getEnchantment(id1).setLevel(lvl, false));
                                         }
+
+                                        int count = countcfg.getInt(owner);
+                                        int result = count - 1;
+                                        countcfg.set(owner, result);
+                                        countcfg.save();
+
+                                        if (Server.getInstance().getPlayer(owner) != null) {
+                                            Server.getInstance().getPlayer(owner).sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().ownbuy());
+                                        }
+                                        pl.getInventory().addItem(item12);
+                                        for (Player all : Server.getInstance().getOnlinePlayers().values()) {
+                                            String name = all.getName();
+                                            if (name.toLowerCase().equals(owner.toLowerCase())) {
+                                                Server.getInstance().getPlayer(owner);
+
+                                            }
+                                        }
+
+                                        timercfg.set("Timer." + hashcode, null);
+                                        timercfg.save();
+
+                                        pl.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().buy());
+                                        auccfg.set("Auction." + hashcode, null);
+                                        auccfg.save();
+
                                     }
-
-                                    timercfg.set("Timer." + hashcode, null);
-                                    timercfg.save();
-
-                                    pl.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().buy());
-                                    auccfg.set("Auction." + hashcode, null);
-//                                    for (int d = 0; d < Auction.getAuction().chest1.size(); d++){
-//                                        Item item = Auction.getAuction().chest1.get(d);
-//                                        if (item.getCustomName().contains(hashcode)){
-//                                            Auction.getAuction().chest1.remove(d);
-//                                        }
-//                                    }
-                                    auccfg.save();
 
                                 } else {
                                     pl.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().money());
@@ -123,16 +119,9 @@ public class InventoryTransactionListener implements Listener {
 
                             }
                         }
-//                        if (this.interact(action.getSourceItem().getId(), event.getTransaction().getSource(), event.getTransaction().getInventories()) || this.interact(action.getTargetItem().getId(), event.getTransaction().getSource(), event.getTransaction().getInventories())) {
-//                            event.setCancelled(true);
-//                        }
-
                     }
 
                     if (act.getInventory().getName().equals(Auction.getAuctionConfig().Storage())) {
-
-//                        Config auccfg = new Config(new File(Auction.getAuction().getDataFolder(), "/auction.yml"), Config.YAML);
-//                        auccfg.reload();
 
                         Config timercfg = new Config(new File(Auction.getAuction().getDataFolder(), "/timer.yml"), Config.YAML);
                         timercfg.reload();
@@ -152,14 +141,11 @@ public class InventoryTransactionListener implements Listener {
                             if (action.getSourceItem().getCustomName().contains(hashcode)) {
 
                                 int price = playercfg.getInt("Inventory." + owner + "." + get1 + ".Cost");
-                                String item1 = playercfg.getString("Inventory." + owner + "." + get1 + ".Items");
-                                String owner1 = playercfg.getString("Inventory." + owner + "." + get1 + ".Owner");
                                 int id = playercfg.getInt("Inventory." + owner + "." + get1 + ".Id");
                                 int count1 = playercfg.getInt("Inventory." + owner + "." + get1 + ".Count");
                                 int damege = playercfg.getInt("Inventory." + owner + "." + get1 + ".Damage");
-                                String date = playercfg.getString("Inventory." + owner + "." + hashcode + ".Date");
 
-                                double maincount = LlamaEconomy.getAPI().getMoney(pl);
+                                double maincount = Auction.getAuction().getMoney(pl.getName());
 
                                 if (maincount >= price) {
 
@@ -169,7 +155,7 @@ public class InventoryTransactionListener implements Listener {
                                     countcfg.save();
 
                                     double resultprice = maincount - price;
-                                    LlamaEconomy.getAPI().setMoney(pl, resultprice);
+                                    Auction.getAuction().setMoney(pl, resultprice);
                                     Item item12 = Item.get(id, damege, count1);
                                     item12.setDamage(damege);
 
@@ -186,12 +172,6 @@ public class InventoryTransactionListener implements Listener {
 
                                     pl.sendMessage(Auction.getAuctionConfig().prefix() + Auction.getAuctionConfig().get());
                                     playercfg.set("Inventory." + owner + "." + hashcode, null);
-//                                    for (int d = 0; d < Auction.getAuction().chest1.size(); d++){
-//                                        Item item = Auction.getAuction().chest1.get(d);
-//                                        if (item.getCustomName().contains(hashcode)){
-//                                            Auction.getAuction().chest1.remove(d);
-//                                        }
-//                                    }
                                     playercfg.save();
                                     playercfg.remove("Inventory." + owner + "." + hashcode);
                                     playercfg.save();
@@ -202,9 +182,6 @@ public class InventoryTransactionListener implements Listener {
 
                             }
                         }
-//                        if (this.interact(action.getSourceItem().getId(), event.getTransaction().getSource(), event.getTransaction().getInventories()) || this.interact(action.getTargetItem().getId(), event.getTransaction().getSource(), event.getTransaction().getInventories())) {
-//                            event.setCancelled(true);
-//                        }
 
                     }
 
@@ -216,7 +193,6 @@ public class InventoryTransactionListener implements Listener {
     private boolean interact(Item item, Player player) {
 
         String storage = Auction.getAuctionConfig().Storage();
-        String info = Auction.getAuctionConfig().Info();
 
         String title = Auction.getAuctionConfig().title();
 
@@ -225,7 +201,7 @@ public class InventoryTransactionListener implements Listener {
 
         if (item.getId() == 339){
             if (item.getName().equals(next + "1")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest1);
@@ -234,7 +210,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "2")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest2);
@@ -243,7 +219,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "3")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest3);
@@ -252,7 +228,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "4")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest4);
@@ -261,7 +237,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "5")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest5);
@@ -270,7 +246,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "6")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest6);
@@ -279,7 +255,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "7")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest7);
@@ -288,7 +264,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "8")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest8);
@@ -297,7 +273,7 @@ public class InventoryTransactionListener implements Listener {
             }
 
             if (item.getName().equals(next + "9")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest9);
@@ -408,7 +384,7 @@ public class InventoryTransactionListener implements Listener {
 
         if (item.getId() == 395){
             if (item.getName().equals(back + "0")){
-                ChestFakeInventory ec2 = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec2 = new DoubleChestFakeInventory();
                 ec2.setName(title);
                 ec2.setTitle(title);
                 ec2.setContents(Auction.getAuction().chest);
@@ -592,9 +568,6 @@ public class InventoryTransactionListener implements Listener {
         if (item.getId() == 54){
             if (item.getName().equals(storage)){
 
-//                Config auccfg = new Config(new File(Auction.getAuction().getDataFolder(), "/playercfg.yml"), Config.YAML);
-//                auccfg.reload();
-
                 Config playercfg = new Config(new File(Auction.getAuction().getDataFolder(), "/playercfg.yml"), Config.YAML);
                 playercfg.reload();
 
@@ -622,7 +595,7 @@ public class InventoryTransactionListener implements Listener {
                     String textdate = Auction.getAuctionConfig().textdate();
                     String texthash = Auction.getAuctionConfig().texthash();
 
-                    Item item2 = Item.get(id, damege, count1).setCustomName(item1 + "\n\n" + textprice + price + value + "\n" + textowner + owner + "\n" + textuntil + "0" + timevalue + "\n" + textdate + date + "\n" + texthash + hashcode + "\n");
+                    Item item2 = Item.get(id, damege, count1).setCustomName(item1 + "\n\n" + textprice + price + value + "\n" + textowner + owner + "\n" + textuntil + "0" + timevalue + "\n" + texthash + hashcode + "\n" + textdate + date + "\n");
                     item2.setDamage(damege);
                     for (String enchId : playercfg.getSection("Inventory." + owner + "." + get1 + ".Enchants").getKeys(false)) {
                         int id1 = Integer.parseInt(enchId);
@@ -646,7 +619,7 @@ public class InventoryTransactionListener implements Listener {
                 Item back1 = Item.get(351).setCustomName(Auction.getAuctionConfig().backstorage());
                 playerinv.put(49, back1);
 
-                ChestFakeInventory ec = new FakeInventories().createDoubleChestInventory();
+                ChestFakeInventory ec = new DoubleChestFakeInventory();
                 ec.setName(storage);
                 ec.setTitle(storage);
                 ec.setContents(playerinv);
@@ -679,13 +652,6 @@ public class InventoryTransactionListener implements Listener {
 
         String title = Auction.getAuctionConfig().title();
         String storage = Auction.getAuctionConfig().Storage();
-
-//        if (event.getInventory() instanceof ChestFakeInventory){
-//            if (event.getInventory().getName().equals("Аукцион")){
-//                Player player = event.getPlayer();
-//                event.setCancelled(true);
-//            }
-//        }
 
         if (event.getInventory() instanceof DoubleChestFakeInventory) {
             if (event.getInventory().getName().equals(title)) {

@@ -1,10 +1,8 @@
 package getmc;
 
 import cn.nukkit.Player;
-import cn.nukkit.Server;
 import cn.nukkit.command.SimpleCommandMap;
 import cn.nukkit.item.Item;
-import cn.nukkit.item.enchantment.Enchantment;
 import cn.nukkit.plugin.PluginBase;
 import cn.nukkit.plugin.PluginManager;
 import cn.nukkit.utils.Config;
@@ -12,6 +10,8 @@ import getmc.Command.AucCMD;
 import getmc.Listener.InventoryTransactionListener;
 import getmc.Utils.AuctionConfig;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import me.onebone.economyapi.EconomyAPI;
+import net.lldv.llamaeconomy.LlamaEconomy;
 
 import java.io.File;
 import java.util.*;
@@ -20,7 +20,12 @@ public class Auction extends PluginBase {
 
     private static Auction instance;
 
-    public List<Integer> pages = new ArrayList<>();
+    /*
+
+    Just where are keeping Information of Items
+
+     */
+
     public Int2ObjectOpenHashMap<Item> chest;
     public Int2ObjectOpenHashMap<Item> chest1;
     public Int2ObjectOpenHashMap<Item> chest2;
@@ -42,26 +47,22 @@ public class Auction extends PluginBase {
     public Int2ObjectOpenHashMap<Item> chest18;
     public Int2ObjectOpenHashMap<Item> chest19;
     public Int2ObjectOpenHashMap<Item> chest20;
-//    public Int2ObjectOpenHashMap<Item> chest21;
-//    public Int2ObjectOpenHashMap<Item> chest22;
-//    public Int2ObjectOpenHashMap<Item> chest23;
-//    public Int2ObjectOpenHashMap<Item> chest24;
-//    public Int2ObjectOpenHashMap<Item> chest25;
-//    public Int2ObjectOpenHashMap<Item> chest26;
-//    public Int2ObjectOpenHashMap<Item> chest27;
-//    public Int2ObjectOpenHashMap<Item> chest28;
-//    public Int2ObjectOpenHashMap<Item> chest29;
-//    public Int2ObjectOpenHashMap<Item> chest30;
 
     private static AuctionConfig auctionConfig;
 
-//    public List<Item> chest1 = new ArrayList<>();
+    /*
+
+    Countdown for Auctions Items
+
+     */
 
     public List<String> feedremove = new ArrayList<String>();
     public List<String> feedkt = new ArrayList<>();
 
     public HashMap<String, Integer> timerList1 = new HashMap();
 
+    private boolean eapi;
+    private boolean leco;
 
     @Override
     public void onLoad() {
@@ -70,6 +71,26 @@ public class Auction extends PluginBase {
 
     @Override
     public void onEnable() {
+
+        /*
+
+        Check for Economy Plugins
+
+         */
+
+        eapi = getServer().getPluginManager().getPlugin("EconomyAPI") != null;
+        leco = getServer().getPluginManager().getPlugin("LlamaEconomy") != null;
+
+        if (!eapi && !leco) {
+            getLogger().warning("§c§lNo economy plugins not found!");
+        }
+
+        /*
+
+        Other important Things
+
+         */
+
         getTimesForAuc();
         auctionConfig = new AuctionConfig(this);
         auctionConfig.createDefaultConfig();
@@ -78,9 +99,14 @@ public class Auction extends PluginBase {
         this.getLogger().info("§fEnable: §a§lAuction");
     }
 
+    /*
+
+        Register Commands and Events
+
+     */
+
     private void register(){
         SimpleCommandMap simpleCommandMap = getServer().getCommandMap();
-//        simpleCommandMap.register("ah", new AucCMD());
         simpleCommandMap.register("help", new AucCMD("ah", Auction.getAuctionConfig().commandDescription(), Auction.getAuctionConfig().usageMessage()));
 
         PluginManager pluginManager = getServer().getPluginManager();
@@ -91,6 +117,49 @@ public class Auction extends PluginBase {
         return auctionConfig;
     }
 
+    /*
+
+    Just for setMoney/getMoney EconomyAPI and LlamaEconomyAPI
+
+     */
+
+    public boolean addMoney(UUID player, int reward) {
+        if (eapi) {
+            return EconomyAPI.getInstance().addMoney(player, reward) == EconomyAPI.RET_SUCCESS;
+        }
+        if (leco) {
+
+            LlamaEconomy.getAPI().addMoney(player, reward);
+            return true;
+        }
+        return false;
+    }
+
+    public void setMoney(Player player, double reward) {
+        if (eapi) {
+            EconomyAPI.getInstance().setMoney(player, reward);
+            return;
+        }
+        if (leco) {
+            LlamaEconomy.getAPI().setMoney(player, reward);
+        }
+    }
+
+    public double getMoney(String player) {
+        if (eapi) {
+            return EconomyAPI.getInstance().myMoney(player);
+        }
+        if (leco) {
+            return LlamaEconomy.getAPI().getMoney(player);
+        }
+        return 0;
+    }
+
+    /*
+
+    Get Time
+
+     */
 
     private void getTimesForAuc(){
 
@@ -109,6 +178,12 @@ public class Auction extends PluginBase {
         }
 
     }
+
+    /*
+
+    Timer for Items
+
+     */
 
     private void startSchedulerItemAuction(){
 

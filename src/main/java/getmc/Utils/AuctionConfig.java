@@ -32,7 +32,8 @@ public class AuctionConfig {
         this.addDefault("options.messages.sell", "§aYou successfully put your Item to Auction");
         this.addDefault("options.messages.usg", "§cUsage: /ah sell <price>");
         this.addDefault("options.messages.ownbuy", "§aYour Item Has Been Successfully Sold");
-        this.addDefault("options.messages.money", "§aThe price is higher than your money balance");
+        this.addDefault("options.messages.money", "§cThe price is higher than your money balance");
+        this.addDefault("options.messages.cantbuy", "§6You can't buy your Item!!");
         this.addDefault("options.auction.title", "Auction");
         this.addDefault("options.auction.item.storage", "Storage");
         this.addDefault("options.auction.item.info", "Information");
@@ -44,7 +45,6 @@ public class AuctionConfig {
         this.addDefault("options.auction.item.text-until", "§cEnd: §b");
         this.addDefault("options.auction.item.text-date", "§fDate: §b");
         this.addDefault("options.auction.item.text-hash", "§cHash: §b");
-        this.addDefault("options.auction.item.text-hash", "§cHash: §b");
         this.addDefault("options.auction.item.text-information", "Info - Edit in Config");
         this.addDefault("options.auction.maxitems", 5);
         this.addDefault("options.auction.timerhours", 5);
@@ -54,10 +54,6 @@ public class AuctionConfig {
 
     public String prefix() {
         return this.config.getString("options.messages.prefix");
-    }
-
-    public String isNotAPlayer() {
-        return this.config.getString("options.messages.isNotAPlayer");
     }
 
     public String price() {
@@ -135,7 +131,7 @@ public class AuctionConfig {
 
     public String permission(){ return this.config.getString("options.messages.permission"); }
 
-    public String experience(){ return this.config.getString("options.messages.experience"); }
+    public String cantbuy(){ return this.config.getString("options.messages.cantbuy"); }
 
     public String commandDescription() {
         return this.config.getString("command.description");
