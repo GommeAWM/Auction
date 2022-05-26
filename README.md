@@ -3,7 +3,8 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 
 ---
 **Requirement:**<br />
-> * Download the `latest version` here: [LlamaEconomy](https://cloudburstmc.org/resources/llamaeconomy.634/)
+> * Download the `latest version` here: [LlamaEconomy](https://cloudburstmc.org/resources/llamaeconomy.634/) 
+> * `or` Download the `latest version` here: [EconomyAPI](https://cloudburstmc.org/resources/economyapi.14/)
 > * Download the `latest version` here: [FakeInventories](https://github.com/CloudburstMC/FakeInventories)
 
 ---
