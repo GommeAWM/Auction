@@ -9,7 +9,7 @@ AuctionHouse | Minecraft Bedrock Edition | Nukkit
 ---
 **Update:**<br/>
 
-*26.05.2022*
+*26.05.2022*<br/>
 :boom: Now the AuctionPlugin supports EconomyAPI and LlamEconomyAPI<br/>
 :boom: Fixed the dupe money bug, now the owner can't buy their item anymore<br/>
 :boom: code optimized<br/>
